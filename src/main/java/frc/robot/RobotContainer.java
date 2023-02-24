@@ -10,18 +10,24 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Commands.DriveCommand;
-import frc.robot.Commands.SetBrakeModeCommand;
+import frc.robot.Commands.SetNeutralModeCommand;
 import frc.robot.Subsystems.DrivetrainSubsystem;
 
 public class RobotContainer {
 
-  DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem();
-  CommandXboxController controller = new CommandXboxController(0);
+  // Initialize subsystems
+  DrivetrainSubsystem drivetrainSubsystem;
+  CommandXboxController controller;
 
   private final double DEADZONE = 0.25;
 
   public RobotContainer() {
+    // Initialize controller and set bindings
+    controller = new CommandXboxController(0);
     configureBindings();
+
+    // Initialize subsystems
+    drivetrainSubsystem = new DrivetrainSubsystem();
 
     drivetrainSubsystem.setDefaultCommand(
         new DriveCommand(() -> deadzoneModifier(controller.getLeftY(), DEADZONE),
@@ -29,15 +35,21 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    controller.a().onTrue(new SetBrakeModeCommand(NeutralMode.Brake, drivetrainSubsystem));
-    controller.y().onTrue(new SetBrakeModeCommand(NeutralMode.Coast, drivetrainSubsystem));
+    controller.a().onTrue(new SetNeutralModeCommand(NeutralMode.Brake, drivetrainSubsystem));
+    controller.y().onTrue(new SetNeutralModeCommand(NeutralMode.Coast, drivetrainSubsystem));
   }
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
   }
 
-  public static double deadzoneModifier(double rawValue, double deadzone) {
+  /**
+   * Apply deadzone to joystick axes
+   * @param rawValue Raw joystick axis value in [-1.0, 1.0]
+   * @param deadzone Deadzone as a percentage in [0, 1.0]
+   * @return Joystick axis with deadzone applied
+   */
+  private static double deadzoneModifier(double rawValue, double deadzone) {
     double result;
     double validRange = 1.0 - deadzone;
     double value = Math.abs(rawValue);
