@@ -15,10 +15,11 @@ import frc.robot.Subsystems.DrivetrainSubsystem;
 
 public class RobotContainer {
 
-  // Initialize subsystems
+  // Create subsystems
   DrivetrainSubsystem drivetrainSubsystem;
   CommandXboxController controller;
 
+  // Set deadzone
   private final double DEADZONE = 0.25;
 
   public RobotContainer() {
