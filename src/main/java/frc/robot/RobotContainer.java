@@ -8,6 +8,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Commands.DriveCommand;
 import frc.robot.Commands.SetNeutralModeCommand;
@@ -36,8 +37,10 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    controller.a().onTrue(new SetNeutralModeCommand(NeutralMode.Brake, drivetrainSubsystem));
-    controller.y().onTrue(new SetNeutralModeCommand(NeutralMode.Coast, drivetrainSubsystem));
+    controller.a()
+        .onTrue(new ConditionalCommand(new SetNeutralModeCommand(NeutralMode.Brake, drivetrainSubsystem),
+            new SetNeutralModeCommand(NeutralMode.Coast, drivetrainSubsystem),
+            () -> drivetrainSubsystem.getNeutralMode() == NeutralMode.Coast));
   }
 
   public Command getAutonomousCommand() {
@@ -46,6 +49,7 @@ public class RobotContainer {
 
   /**
    * Apply deadzone to joystick axes
+   * 
    * @param rawValue Raw joystick axis value in [-1.0, 1.0]
    * @param deadzone Deadzone as a percentage in [0, 1.0]
    * @return Joystick axis with deadzone applied
